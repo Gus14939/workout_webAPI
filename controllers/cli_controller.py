@@ -4,17 +4,17 @@ from models.user import User
 
 db_commands = Blueprint("db", __name__)
 
-@db_commands.cli.command("create_tables")
+@db_commands.cli.command("create_table")
 def create_tables():
     db.create_all()
     print("Tables created")
     
-@db_commands.cli.command("drop_tables")
+@db_commands.cli.command("drop_table")
 def drop_tables():
     db.drop_all()
     print("Tables dropped")
     
-@db_commands.cli.command("seed_tables")
+@db_commands.cli.command("seed_table")
 def seed_tables():
     user = [
         User(
