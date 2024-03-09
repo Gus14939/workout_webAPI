@@ -1,3 +1,4 @@
+from marshmallow import fields
 from init import db, ma
 
 class User(db.Model):
@@ -7,15 +8,20 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
-    date_joined = db.Column(db.String, nullable=False)
     age = db.Column(db.String, nullable=False)
     weight = db.Column(db.String, nullable=False)
     height = db.Column(db.String, nullable=False)
     gender = db.Column(db.String, nullable=False)
+    date_joined = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    
+    routine = db.relationship("Routines", back_populates="user", cascade="all, delete")
     
     
 class UserSchema(ma.Schema):
+    
+    routines = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
+    
     class Meta:
         fields = ("id", "name", "email", "password", "date_joined", "age", "weight", "height", "gender", "is_admin")
         
