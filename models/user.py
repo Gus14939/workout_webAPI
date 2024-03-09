@@ -15,12 +15,12 @@ class User(db.Model):
     date_joined = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     
-    routine = db.relationship("Routines", back_populates="user", cascade="all, delete")
+    routine_table = db.relationship("Routine", back_populates="user", cascade="all, delete")
     
     
 class UserSchema(ma.Schema):
     
-    routines = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
+    routine_table = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
     
     class Meta:
         fields = ("id", "name", "email", "password", "date_joined", "age", "weight", "height", "gender", "is_admin")
