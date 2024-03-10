@@ -1,6 +1,8 @@
+from datetime import date
 from flask import Blueprint
 from init import db, bcrypt
 from models.user import User
+from models.routine import Routine
 
 db_commands = Blueprint("db", __name__)
 
@@ -16,12 +18,12 @@ def drop_tables():
     
 @db_commands.cli.command("seed_tables")
 def seed_tables():
-    user = [
+    users = [
         User(
             name = "The Admin",
             email = "admin@workoutwebAPI.com",
             password = bcrypt.generate_password_hash('1234').decode('utf-8'),
-            date_joined = "",
+            date_joined = date.today(),
             age = "",
             weight = "",
             height = "",
@@ -32,15 +34,43 @@ def seed_tables():
             name = "Gustavo Jimenez",
             email = "gus.jim@workoutwebAPI.com",
             password = bcrypt.generate_password_hash('1234').decode('utf-8'),
-            date_joined = "February",
+            date_joined = date.today(),
             age = "43",
             weight = "68",
             height = "170",
             gender = "1"
         )
     ]
+    db.session.add_all(users)
     
-    db.session.add_all(user)
+    routines = [
+        Routine(
+            name = "Chest",
+            description = "Description for Chest workout",
+            weekday = "Monday",
+            user = users[0]
+        ),
+        Routine(
+            name = "Legs",
+            description = "Description for Legs exercises",
+            weekday = "Tuesday",
+            user = users[1]
+        ),
+        Routine(
+            name = "Arms",
+            description = "Description of the best Arms exercises",
+            weekday = "Wednesday",
+            user = users[1]
+        ),
+        Routine(
+            name = "Back",
+            description = "Description of the most helpful strength workout",
+            weekday = "Thursday",
+            user = users[1]
+        )
+    ]
+    db.session.add_all(routines)
+    
     db.session.commit() 
     
     print("Tables seeded")

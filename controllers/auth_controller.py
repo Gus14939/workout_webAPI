@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
@@ -30,7 +30,6 @@ def auth_register():
             return {"error": str(e)}, 400
         
         name = body_data.get("name")
-        date_joined = body_data.get("date_joined")
         age = body_data.get("age")
         weight = body_data.get("weight")
         height = body_data.get("height")
@@ -41,11 +40,11 @@ def auth_register():
         new_user = User(
             name = name,
             email = normalised_email,
-            date_joined = date_joined,
             age = age,
             weight = weight,
             height = height,
-            gender = gender
+            gender = gender,
+            date_joined = date.today()
             # is_admin
         )
         
