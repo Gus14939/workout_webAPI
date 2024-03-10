@@ -3,6 +3,7 @@ from flask import Blueprint
 from init import db, bcrypt
 from models.user import User
 from models.routine import Routine
+from models.exercise import Exercise
 
 db_commands = Blueprint("db", __name__)
 
@@ -70,6 +71,28 @@ def seed_tables():
         )
     ]
     db.session.add_all(routines)
+    
+    exercises = [
+        Exercise(
+            name = "Bech Press",
+            category = "easy",
+            muscles = ["Pectoralis major", "Anterior deltoids", "Triceps brachii"],
+            description = "Lie on a weight bench, grasp the barbell with an overhand grip, and position your arms slightly wider than shoulder-width apart",
+        ),
+        Exercise(
+            name="Leg Press",
+            category="easy",
+            muscles=["Quadriceps", "Hamstrings", "Glutes"],
+            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate. Push the weight away by extending your legs, then slowly lower it back down.",
+        ),
+        Exercise(
+            name="Pull-Ups",
+            category="intermediate",
+            muscles=["Latissimus dorsi", "Biceps", "Rhomboids"],
+            description="The pull-up is an upper-body strength exercise that targets the latissimus dorsi (lats), biceps, and rhomboids."
+        )    
+    ]
+    db.session.add_all(exercises)
     
     db.session.commit() 
     
