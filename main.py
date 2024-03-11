@@ -23,9 +23,11 @@ def create_app():
     from controllers.auth_controller import auth_bp
     app.register_blueprint(auth_bp)
     
-    from controllers.routine_controller import routines_bp
-    app.register_blueprint(routines_bp)
+    from controllers.routine_controller import routine_bp
+    app.register_blueprint(routine_bp)
     
+    from controllers.exercise_controller import exercise_bp
+    app.register_blueprint(exercise_bp)
     #
     return app
 
