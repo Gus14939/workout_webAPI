@@ -13,7 +13,7 @@ class Routine(db.Model):
     
     user_id = db.Column(db.Integer, db.ForeignKey("user_table.id"), nullable=False)
     
-    user = db.relationship('User', back_populates="routine_table")
+    user = db.relationship('User', back_populates="routines")
     
 class RoutineSchema(ma.Schema):
     

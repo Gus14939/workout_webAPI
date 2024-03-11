@@ -77,13 +77,13 @@ def seed_tables():
             name = "Bench Press",
             category = "easy",
             muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
-            description = "Lie on a weight bench, grasp the barbell with an overhand grip, and position your arms slightly wider than shoulder-width apart"
+            description = "Lie on a weight bench, grasp the barbell with an overhand grip."
         ),
         Exercise(
             name="Leg Press",
             category="easy",
             muscles="Quadriceps, Hamstrings, Glutes",
-            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate. Push the weight away by extending your legs, then slowly lower it back down."
+            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate."
         )
     ]
     db.session.add_all(exercises)
