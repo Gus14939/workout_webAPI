@@ -65,7 +65,7 @@ def seed_tables():
         ),
         Routine(
             name = "Back",
-            description = "Description of the most helpful strength workout",
+            description = "Description Back",
             weekday = "Thursday",
             user = users[1]
         )
@@ -77,13 +77,15 @@ def seed_tables():
             name = "Bench Press",
             category = "easy",
             muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
-            description = "Lie on a weight bench, grasp the barbell with an overhand grip."
+            description = "Description Bench Press",
+            user = users[1]
         ),
         Exercise(
             name="Leg Press",
             category="easy",
             muscles="Quadriceps, Hamstrings, Glutes",
-            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate."
+            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate.",
+            user = users[1]
         )
     ]
     db.session.add_all(exercises)
