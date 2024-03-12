@@ -4,6 +4,7 @@ from init import db, bcrypt
 from models.user import User
 from models.routine import Routine
 from models.exercise import Exercise
+from models.sets_reps import SetsReps
 
 db_commands = Blueprint("db", __name__)
 
@@ -42,7 +43,15 @@ def seed_tables():
             gender = "1"
         )
     ]
-    db.session.add_all(users)
+    db.session.add_all(users)    
+    
+    sets_reps = [
+        SetsReps(
+            sets = "4",
+            reps = "10"
+        )
+    ]
+    db.session.add_all(sets_reps)
     
     routines = [
         Routine(
@@ -78,17 +87,19 @@ def seed_tables():
             category = "easy",
             muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
             description = "Description Bench Press",
-            user = users[1]
+            user = users[1],
+            sets_and_reps = sets_reps[0]
         ),
         Exercise(
             name="Leg Press",
             category="easy",
             muscles="Quadriceps, Hamstrings, Glutes",
             description="Sit on the leg press machine with your feet shoulder-width apart on the footplate.",
-            user = users[1]
+            user = users[1],
+            sets_and_reps = sets_reps[0]
         )
     ]
-    db.session.add_all(exercises)
+    db.session.add_all(exercises)    
     
     db.session.commit() 
     
