@@ -17,7 +17,7 @@ class Routine(db.Model):
     
 class RoutineSchema(ma.Schema):
     
-    # user = fields.Nested('UserSchema', only=["name"])
+    user = fields.Nested('UserSchema', only=["name"])
     
     class Meta:
         fields = ("id", "name", "description", "weekday", "user")
