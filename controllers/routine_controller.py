@@ -4,16 +4,16 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from init import db, bcrypt
 from models.routine import Routine, routines_schema, routine_schema
 
-routines_bp = Blueprint("routines", __name__, url_prefix="/routines")
+routine_bp = Blueprint("routines", __name__, url_prefix="/routines")
 
 # The Read - part of CRUD
-@routines_bp.route("/")
+@routine_bp.route("/")
 def get_all_routines():
     stmt = db.select(Routine).order_by(Routine.id)
     routines = db.session.scalars(stmt)
     return routines_schema.dump(routines)
 
-@routines_bp.route("name/<routine_name>")
+@routine_bp.route("/name/<routine_name>")
 def get_routine_byName(routine_name):
     stmt = db.select(Routine).filter_by(name=routine_name)
     one_routine = db.session.scalar(stmt)
@@ -22,7 +22,7 @@ def get_routine_byName(routine_name):
     else:
         return {"error": f"Routine for '{routine_name}' hasn't been setup yet"}, 404
 
-@routines_bp.route("/day/<routine_Day>")
+@routine_bp.route("/day/<routine_Day>")
 def get_routine_byDay(routine_Day):
     stmt = db.select(Routine).filter_by(weekday=routine_Day)
     one_routine = db.session.scalar(stmt)
@@ -33,7 +33,7 @@ def get_routine_byDay(routine_Day):
         return {"error": f"Routine for '{routine_Day}' hasn't been setup yet"}, 404
 
 # The Create - part of CRUD
-@routines_bp.route("/", methods=["POST"])
+@routine_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_routine():
     body_data = request.get_json()
@@ -52,7 +52,7 @@ def create_new_routine():
     return routine_schema.dump(routine), 201
         
 # The Update - part of CRUD
-@routines_bp.route("/<routine_id>", methods=["PATCH", "PUT"])
+@routine_bp.route("/<routine_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_routine(routine_id):
     body_data = request.get_json()
@@ -71,7 +71,7 @@ def update_routine(routine_id):
         return {"message": f"Routine not found"}, 404
         
 # The Delete - part of CRUD
-@routines_bp.route("/<routine_id>", methods=["DELETE"])
+@routine_bp.route("/<routine_id>", methods=["DELETE"])
 @jwt_required()
 def delete_routine(routine_id):
     stmt = db.select(Routine).where(Routine.id == routine_id)

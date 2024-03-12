@@ -3,6 +3,7 @@ from flask import Blueprint
 from init import db, bcrypt
 from models.user import User
 from models.routine import Routine
+from models.exercise import Exercise
 
 db_commands = Blueprint("db", __name__)
 
@@ -64,12 +65,30 @@ def seed_tables():
         ),
         Routine(
             name = "Back",
-            description = "Description of the most helpful strength workout",
+            description = "Description Back",
             weekday = "Thursday",
             user = users[1]
         )
     ]
     db.session.add_all(routines)
+    
+    exercises = [
+        Exercise(
+            name = "Bench Press",
+            category = "easy",
+            muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
+            description = "Description Bench Press",
+            user = users[1]
+        ),
+        Exercise(
+            name="Leg Press",
+            category="easy",
+            muscles="Quadriceps, Hamstrings, Glutes",
+            description="Sit on the leg press machine with your feet shoulder-width apart on the footplate.",
+            user = users[1]
+        )
+    ]
+    db.session.add_all(exercises)
     
     db.session.commit() 
     

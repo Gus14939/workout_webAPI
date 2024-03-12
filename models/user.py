@@ -15,15 +15,19 @@ class User(db.Model):
     date_joined = db.Column(db.Date) 
     is_admin = db.Column(db.Boolean, default=False)
     
-    routine_table = db.relationship("Routine", back_populates="user", cascade="all, delete")
+    routines = db.relationship("Routine", back_populates="user", cascade="all, delete")
+    
+    exercises = db.relationship("Exercise", back_populates="user", cascade="all, delete")
     
     
 class UserSchema(ma.Schema):
     
-    routine_table = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
+    routines = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
+    
+    exercises = fields.List(fields.Nested("ExerciseSchema", exclude=["user"]))
     
     class Meta:
-        fields = ("id", "name", "email", "password", "age", "weight", "height", "gender", "date_joined", "is_admin")
+        fields = ("id", "name", "email", "password", "age", "weight", "height", "gender", "date_joined", "is_admin", "routines", "exercises")
         
 
 user_schema = UserSchema(exclude=["password"])
