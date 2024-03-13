@@ -79,6 +79,6 @@ def delete_routine(routine_id):
     if routine:
         db.session.delete(routine)
         db.session.commit() 
-        return {"message": f"Routine of {routine.name} for {routine.weekday} has now been deleted"}
+        return {"message": f"{routine.name} routine for {routine.weekday} has now been deleted"}
     else:
         return {"message": f"Routine not found"}, 404

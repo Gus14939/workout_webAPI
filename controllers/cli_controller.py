@@ -45,20 +45,12 @@ def seed_tables():
     ]
     db.session.add_all(users)    
     
-    sets_reps = [
-        SetsReps(
-            sets = "4",
-            reps = "10"
-        )
-    ]
-    db.session.add_all(sets_reps)
-    
     routines = [
         Routine(
             name = "Chest",
             description = "Description for Chest workout",
             weekday = "Monday",
-            user = users[0]
+            user = users[1]
         ),
         Routine(
             name = "Legs",
@@ -70,13 +62,13 @@ def seed_tables():
             name = "Arms",
             description = "Description of the best Arms exercises",
             weekday = "Wednesday",
-            user = users[1]
+            user = users[0]
         ),
         Routine(
             name = "Back",
             description = "Description Back",
             weekday = "Thursday",
-            user = users[1]
+            user = users[0]
         )
     ]
     db.session.add_all(routines)
@@ -88,7 +80,15 @@ def seed_tables():
             muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
             description = "Description Bench Press",
             user = users[1],
-            sets_and_reps = sets_reps[0]
+            routine = routines[0]
+        ),
+        Exercise(
+            name = "Push-Ups",
+            category = "easy",
+            muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
+            description = "Description Push-Ups",
+            user = users[1],
+            routine = routines[0]
         ),
         Exercise(
             name="Leg Press",
@@ -96,7 +96,7 @@ def seed_tables():
             muscles="Quadriceps, Hamstrings, Glutes",
             description="Sit on the leg press machine with your feet shoulder-width apart on the footplate.",
             user = users[1],
-            sets_and_reps = sets_reps[0]
+            routine = routines[1]
         )
     ]
     db.session.add_all(exercises)    
