@@ -12,15 +12,18 @@ class Routine(db.Model):
     
     
     user_id = db.Column(db.Integer, db.ForeignKey("user_table.id"), nullable=False)
-    
+    # user_id = db.Column(db.Integer, db.ForeignKey("user_table.id"), nullable=False)
+
     user = db.relationship('User', back_populates="routines")
+    exercises = db.relationship('Exercise', back_populates="routine", cascade='all, delete')
     
 class RoutineSchema(ma.Schema):
     
-    user = fields.Nested('UserSchema', only=["name"])
+    user = fields.Nested('UserSchema', exclude=["password", "email", "is_admin", "date_joined", "routines", "exercises", "sets_and_reps"])
+    exercises = fields.List(fields.Nested('ExerciseSchema', exclude=["routine"]))
     
     class Meta:
-        fields = ("id", "name", "description", "weekday", "user")
+        fields = ("id", "name", "description", "weekday", "user", "exercises")
         
 routine_schema = RoutineSchema()
 routines_schema = RoutineSchema(many=True)

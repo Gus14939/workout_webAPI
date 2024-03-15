@@ -26,8 +26,11 @@ def create_app():
     from controllers.routine_controller import routine_bp
     app.register_blueprint(routine_bp)
     
-    from controllers.exercise_controller import exercise_bp
-    app.register_blueprint(exercise_bp)
+    # from controllers.exercise_controller import exercise_bp
+    # app.register_blueprint(exercise_bp)
+    
+    from controllers.sets_reps_controller import sets_reps_bp
+    app.register_blueprint(sets_reps_bp)
     #
     return app
 

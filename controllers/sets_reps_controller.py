@@ -1,27 +1,27 @@
-'''
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db, bcrypt
-from models.exercise import Exercise, exercises_schema, exercise_schema
+from models.sets_reps import SetsReps, set_rep_schema, sets_reps_schema
 
-exercise_bp = Blueprint("exercises", __name__, url_prefix="/exercises")
+sets_reps_bp = Blueprint("set_and_reps", __name__, url_prefix="/sets_and_reps")
 
 # The Read - part of CRUD
-@exercise_bp.route("/")
-def get_all_exercises():
-    stmt = db.select(Exercise).order_by(Exercise.id)
-    exercises = db.session.scalars(stmt)
-    return exercises_schema.dump(exercises)
+'''
+@sets_reps_bp.route("/")s
+def get_all_sets_reps():
+    stmt = db.select(SetsReps).order_by(SetsReps.id)
+    sets_and_reps = db.session.scalars(stmt)
+    return sets_reps_schema.dump(sets_and_reps)
 
-@exercise_bp.route("/name/<exercise_name>")
-def get_exercise_byName(exercise_name):
-    stmt = db.select(Exercise).filter_by(name=exercise_name)
-    one_exercise = db.session.scalar(stmt)
-    if one_exercise:
-        return exercise_schema.dump(one_exercise)
+@sets_reps_bp.route("/<set_and_rep_id>")
+def get_set_and_rep_byID(set_and_rep_id):
+    stmt = db.select(SetsReps).filter_by(name=set_and_rep_id)
+    set_and_rep = db.session.scalar(stmt)
+    if set_and_rep:
+        return set_rep_schema.dump(set_and_rep)
     else:
-        return {"error": f"'{exercise_name}' exercise hasn't been created yet"}, 404
+        return {"error": f"'{set_and_rep_id}' exercise hasn't been created yet"}, 404
 
 
 # The Create - part of CRUD
@@ -45,7 +45,7 @@ def create_new_exercise():
     return exercise_schema.dump(exercise), 201
 
 # The Update - part of CRUD
-@exercise_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
+@exercise_bp.route("/<exercise_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_exercise(exercise_id):
     body_data = request.get_json()
@@ -65,7 +65,7 @@ def update_exercise(exercise_id):
         return {"message": f"Exercise not found"}, 404
      
 # The Delete - part of CRUD
-@exercise_bp.route("/<int:exercise_id>", methods=["DELETE"])
+@exercise_bp.route("/<exercise_id>", methods=["DELETE"])
 @jwt_required()
 def delete_exercise(exercise_id):
     stmt = db.select(Exercise).where(Exercise.id == exercise_id)

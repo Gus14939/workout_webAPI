@@ -4,6 +4,7 @@ from init import db, bcrypt
 from models.user import User
 from models.routine import Routine
 from models.exercise import Exercise
+from models.sets_reps import SetsReps
 
 db_commands = Blueprint("db", __name__)
 
@@ -42,14 +43,14 @@ def seed_tables():
             gender = "1"
         )
     ]
-    db.session.add_all(users)
+    db.session.add_all(users)    
     
     routines = [
         Routine(
             name = "Chest",
             description = "Description for Chest workout",
             weekday = "Monday",
-            user = users[0]
+            user = users[1]
         ),
         Routine(
             name = "Legs",
@@ -61,13 +62,13 @@ def seed_tables():
             name = "Arms",
             description = "Description of the best Arms exercises",
             weekday = "Wednesday",
-            user = users[1]
+            user = users[0]
         ),
         Routine(
             name = "Back",
             description = "Description Back",
             weekday = "Thursday",
-            user = users[1]
+            user = users[0]
         )
     ]
     db.session.add_all(routines)
@@ -78,17 +79,43 @@ def seed_tables():
             category = "easy",
             muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
             description = "Description Bench Press",
-            user = users[1]
+            user = users[1],
+            routine = routines[0]
+        ),
+        Exercise(
+            name = "Push-Ups",
+            category = "easy",
+            muscles = "Pectoralis major, Anterior deltoids, Triceps brachii",
+            description = "Description Push-Ups",
+            user = users[1],
+            routine = routines[0]
         ),
         Exercise(
             name="Leg Press",
             category="easy",
             muscles="Quadriceps, Hamstrings, Glutes",
             description="Sit on the leg press machine with your feet shoulder-width apart on the footplate.",
-            user = users[1]
+            user = users[1],
+            routine = routines[1]
         )
     ]
-    db.session.add_all(exercises)
+    db.session.add_all(exercises)   
+    
+    set_and_reps = [
+        SetsReps(
+            sets = "4",
+            reps = "10",
+            user = users[1],
+            # exercise = exercises[0]
+        ), 
+        SetsReps(
+            sets = "3",
+            reps = "20",
+            user = users[1],
+            # exercise = exercises[1]
+        )
+    ]
+    db.session.add_all(set_and_reps)   
     
     db.session.commit() 
     
