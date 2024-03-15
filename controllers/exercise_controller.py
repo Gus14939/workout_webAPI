@@ -1,3 +1,4 @@
+'''
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -44,7 +45,7 @@ def create_new_exercise():
     return exercise_schema.dump(exercise), 201
 
 # The Update - part of CRUD
-@exercise_bp.route("/<exercise_id>", methods=["PATCH", "PUT"])
+@exercise_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_exercise(exercise_id):
     body_data = request.get_json()
@@ -64,7 +65,7 @@ def update_exercise(exercise_id):
         return {"message": f"Exercise not found"}, 404
      
 # The Delete - part of CRUD
-@exercise_bp.route("/<exercise_id>", methods=["DELETE"])
+@exercise_bp.route("/<int:exercise_id>", methods=["DELETE"])
 @jwt_required()
 def delete_exercise(exercise_id):
     stmt = db.select(Exercise).where(Exercise.id == exercise_id)
@@ -75,3 +76,4 @@ def delete_exercise(exercise_id):
         return {"message": f"{exercise.name} exercise has now been deleted"}
     else:
         return {"message": f"Exercise not found"}, 404
+    '''

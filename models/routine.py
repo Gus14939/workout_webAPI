@@ -19,8 +19,8 @@ class Routine(db.Model):
     
 class RoutineSchema(ma.Schema):
     
-    user = fields.Nested('UserSchema', only=["name"])
-    exercises = fields.List(fields.Nested('ExerciseSchema', exclude=["user"]))
+    user = fields.Nested('UserSchema', exclude=["password", "email", "is_admin", "date_joined", "routines", "exercises", "sets_and_reps"])
+    exercises = fields.List(fields.Nested('ExerciseSchema', exclude=["routine"]))
     
     class Meta:
         fields = ("id", "name", "description", "weekday", "user", "exercises")

@@ -86,7 +86,7 @@ def auth_login():
         # create jwt
         token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=15))
         # return the token along with the user info
-        return {"email": user.email, "token": token, "is_admin": user.is_admin}
+        return {"name": user.name, "email": user.email, "token": token, "is_admin": user.is_admin, "user":user.id}
     # else
     else:
         # return error

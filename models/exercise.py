@@ -6,7 +6,7 @@ class Exercise(db.Model):
     __tablename__ = "exercise_table"
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), nullable=False, unique=True) # have to catch error
+    name = db.Column(db.String(30), nullable=False)
     category = db.Column(db.String(30))
     muscles = db.Column(db.String(60))
     description = db.Column(db.Text)
@@ -27,7 +27,7 @@ class ExerciseSchema(ma.Schema):
     # sets_and_reps = fields.Nested('SetsRepsSchema', only=["sets", "reps"])
     
     class Meta:
-        fields = ("id", "name", "category", "muscles", "description", "user", "routine")
+        fields = ("id", "name", "category", "muscles", "description", "routine", "user")
         # fields = ("id", "name", "category", "muscles", "description", "user", "sets_and_reps")
 
 exercise_schema = ExerciseSchema()
