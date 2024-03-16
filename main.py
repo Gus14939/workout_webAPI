@@ -20,6 +20,9 @@ def create_app():
     from controllers.cli_controller import db_commands
     app.register_blueprint(db_commands)
     
+    # from controllers.user_controller import user_bp
+    # app.register_blueprint(user_bp)
+    
     from controllers.auth_controller import auth_bp
     app.register_blueprint(auth_bp)
     

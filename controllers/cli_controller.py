@@ -101,21 +101,21 @@ def seed_tables():
     ]
     db.session.add_all(exercises)   
     
-    set_and_reps = [
+    sets_reps = [
         SetsReps(
             sets = "4",
             reps = "10",
             user = users[1],
-            # exercise = exercises[0]
+            exercises = exercises[0]
         ), 
         SetsReps(
             sets = "3",
             reps = "20",
             user = users[1],
-            # exercise = exercises[1]
+            exercises = exercises[1]
         )
     ]
-    db.session.add_all(set_and_reps)   
+    db.session.add_all(sets_reps)   
     
     db.session.commit() 
     

@@ -16,23 +16,24 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     
     routines = db.relationship("Routine", back_populates="user", cascade="all, delete")
+    
     exercises = db.relationship("Exercise", back_populates="user", cascade="all, delete")
     
-    sets_and_reps = db.relationship("SetsReps", back_populates="user", cascade="all, delete")
+    sets_reps = db.relationship("SetsReps", back_populates="user", cascade="all, delete")
     
 class UserSchema(ma.Schema):
     
-    routines = fields.List(fields.Nested("RoutineSchema", exclude=["user"]))
+    routines = fields.List(fields.Nested("RoutineSchema", only=["name"]))
     
-    exercises = fields.List(fields.Nested("ExerciseSchema", exclude=["user"]))
+    exercises = fields.List(fields.Nested("ExerciseSchema", only=["name"]))
     
-    sets_and_reps = fields.List(fields.Nested("SetsReps", exclude=["user"]))
+    sets_reps = fields.List(fields.Nested("SetsReps", exclude=["user"]))
     
     class Meta:
-        fields = ("id", "name", "email", "password", "age", "weight", "height", "gender", "date_joined", "is_admin", "routines", "exercises", "sets_and_reps")
         
+        fields = ("id", "name", "email", "password", "age", "weight", "height", "gender", "date_joined", "is_admin", "routines", "exercises", "sets_reps")
 
-user_schema = UserSchema(exclude=["password"])
-users_schema = UserSchema(many=True, exclude=["password"])
+user_schema = UserSchema(exclude=["password", "routines", "exercises", "sets_reps"])
+users_schema = UserSchema(many=True, exclude=["password", "routines", "exercises", "sets_reps"])
         
         
