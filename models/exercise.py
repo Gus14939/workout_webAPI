@@ -23,7 +23,7 @@ class ExerciseSchema(ma.Schema):
     
     user = fields.Nested('UserSchema', only=["name"])
     routine = fields.Nested('RoutineSchema', only=["weekday"])
-    sets_reps = fields.List(fields.Nested('SetsRepsSchema', only=["id", "sets", "reps", "target"]))
+    sets_reps = fields.List(fields.Nested('SetsRepsSchema', only=["id", "sets", "reps", "goal"]))
     
     class Meta:
         # fields = ("id", "name", "category", "muscles", "description", "routine", "user")

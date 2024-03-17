@@ -27,11 +27,12 @@ def create_sets_reps(exercise_id):
     set_rep = db.session.scalar(stmt_set_rep)
     
     if exercise.sets_reps:
-        return [{"error": f"There are asigned sets and repetitions to {exercise.name}"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, target: {set_rep.target}"}]
+        return [{"error": f"There are asigned sets and repetitions to {exercise.name}"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}]
     if exercise:
         set_rep = SetsReps(
             sets = body_data.get("sets"),
             reps = body_data.get("reps"),
+            goal = body_data.get("goal"),
             exercise_id = exercise_id,           
             user_id = get_jwt_identity()
         )
@@ -67,7 +68,7 @@ def edit_sets_reps(exercise_id, sets_reps_id):
     if set_rep:
         set_rep.sets = body_data.get("sets") or set_rep.sets
         set_rep.reps = body_data.get("reps") or set_rep.reps
-        set_rep.target = body_data.get("target") or set_rep.target
+        set_rep.goal = body_data.get("goal") or set_rep.goal
         
         db.session.commit()
         return set_rep_schema.dump(set_rep)
