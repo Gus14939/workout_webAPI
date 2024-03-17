@@ -103,14 +103,16 @@ def seed_tables():
     
     sets_reps = [
         SetsReps(
-            sets = "4",
-            reps = "10",
+            sets = "6",
+            reps = "4",
+            target = "Strenght",
             user = users[1],
             exercises = exercises[0]
         ), 
         SetsReps(
             sets = "3",
             reps = "20",
+            target = "Tone",
             user = users[1],
             exercises = exercises[1]
         )
