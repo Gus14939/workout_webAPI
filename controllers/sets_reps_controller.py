@@ -2,78 +2,74 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db, bcrypt
-from models.sets_reps import SetsReps, set_rep_schema, sets_reps_schema
+from models.exercise import Exercise
+from models.sets_reps import SetsReps, set_rep_schema
 
-sets_reps_bp = Blueprint("set_and_reps", __name__, url_prefix="/sets_and_reps")
+
+sets_reps_bp = Blueprint("set_and_reps", __name__, url_prefix="/<int:exercise_id>/sets_and_reps")
 
 # The Read - part of CRUD
-'''
-@sets_reps_bp.route("/")s
-def get_all_sets_reps():
-    stmt = db.select(SetsReps).order_by(SetsReps.id)
-    sets_and_reps = db.session.scalars(stmt)
-    return sets_reps_schema.dump(sets_and_reps)
 
-@sets_reps_bp.route("/<set_and_rep_id>")
-def get_set_and_rep_byID(set_and_rep_id):
-    stmt = db.select(SetsReps).filter_by(name=set_and_rep_id)
-    set_and_rep = db.session.scalar(stmt)
-    if set_and_rep:
-        return set_rep_schema.dump(set_and_rep)
-    else:
-        return {"error": f"'{set_and_rep_id}' exercise hasn't been created yet"}, 404
+    # "/exercises") only exes
+# "/<int:routine_id>/exercises" 
 
+# "/exercises/<int:exercise_id>/sets_and_reps" GET POST
+# "/exercises/<int:exercise_id>/sets_and_reps/<int:sets_reps_id>" PUT PATCH DELETE
 
-# The Create - part of CRUD
-@exercise_bp.route("/", methods=["POST"])
+@sets_reps_bp.route("/", methods=["POST"])
 @jwt_required()
-def create_new_exercise():
+def create_sets_reps(exercise_id):
     body_data = request.get_json()
-    # body_data = exercise_schema.load(request.get_json())
-    # Create a new card model instance
-    exercise = Exercise(
-        name = body_data.get("name"), # it's unique have to handle errors
-        category = body_data.get("category"),
-        muscles = body_data.get("muscles"),
-        description = body_data.get("description"),
-        user_id = get_jwt_identity()
-    )
-    # add to the session and commit
-    db.session.add(exercise)
-    db.session.commit()
-    # return the newly cerated card
-    return exercise_schema.dump(exercise), 201
-
-# The Update - part of CRUD
-@exercise_bp.route("/<exercise_id>", methods=["PATCH", "PUT"])
-@jwt_required()
-def update_exercise(exercise_id):
-    body_data = request.get_json()
-    
-    stmt = db.select(Exercise).filter_by(id = exercise_id)
+    stmt = db.select(Exercise).filter_by(id=exercise_id)
     exercise = db.session.scalar(stmt)
     
-    if exercise:
-        exercise.name = body_data.get("name") or exercise.name
-        exercise.category = body_data.get("category") or exercise.category
-        exercise.muscles = body_data.get("muscles") or exercise.muscles
-        exercise.description = body_data.get("description") or exercise.description
+    stmt_set_rep = db.select(SetsReps).filter_by(exercise_id=exercise_id)
+    set_rep = db.session.scalar(stmt_set_rep)
     
+    if exercise.sets_reps:
+        return [{"error": f"There are asigned sets and repetitions to {exercise.name}"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, target: {set_rep.target}"}]
+    if exercise:
+        set_rep = SetsReps(
+            sets = body_data.get("sets"),
+            reps = body_data.get("reps"),
+            exercise_id = exercise_id,           
+            user_id = get_jwt_identity()
+        )
+        db.session.add(set_rep)
         db.session.commit()
-        return exercise_schema.dump(exercise)
+        return set_rep_schema.dump(set_rep), 201
     else:
-        return {"message": f"Exercise not found"}, 404
-     
-# The Delete - part of CRUD
-@exercise_bp.route("/<exercise_id>", methods=["DELETE"])
+        return {"error": f"{exercise.name} not found"}, 404
+
+@sets_reps_bp.route("/", methods=["DELETE"])
 @jwt_required()
-def delete_exercise(exercise_id):
-    stmt = db.select(Exercise).where(Exercise.id == exercise_id)
-    exercise = db.session.scalar(stmt)
-    if exercise:
-        db.session.delete(exercise)
-        db.session.commit() 
-        return {"message": f"{exercise.name} exercise has now been deleted"}
+def delete_sets_reps(exercise_id):
+    stmt = db.select(SetsReps).filter_by(exercise_id=exercise_id)
+    set_rep = db.session.scalar(stmt)
+    
+    stmt_exercise = db.select(Exercise).filter_by(id=exercise_id)
+    exercise = db.session.scalar(stmt_exercise)
+    
+    if set_rep:
+        db.session.delete(set_rep)
+        db.session.commit()
+        return {"message": f"sets and reps for {exercise.name} have been deleted"}
     else:
-        return {"message": f"Exercise not found"}, 404
-    '''
+        return {"error": f"sets and repetitions are not yet set up for {exercise.name}"}, 404
+    
+@sets_reps_bp.route("/<int:sets_reps_id>", methods=["PATCH", "PUT"])
+@jwt_required()
+def edit_sets_reps(exercise_id, sets_reps_id):
+    body_data = request.get_json()
+    stmt = db.select(SetsReps).filter_by(id=sets_reps_id, exercise_id=exercise_id)
+    set_rep = db.session.scalar(stmt)
+    
+    if set_rep:
+        set_rep.sets = body_data.get("sets") or set_rep.sets
+        set_rep.reps = body_data.get("reps") or set_rep.reps
+        set_rep.target = body_data.get("target") or set_rep.target
+        
+        db.session.commit()
+        return set_rep_schema.dump(set_rep)
+    else:
+        return {"error": f"No sets and repetitions found in '{exercise_id.name}'"}, 404

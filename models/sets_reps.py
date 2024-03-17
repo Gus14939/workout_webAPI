@@ -8,6 +8,7 @@ class SetsReps(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sets = db.Column(db.Integer)
     reps = db.Column(db.Integer)
+    target = db.Column(db.String(20))
     
     
     
@@ -27,7 +28,7 @@ class SetsRepsSchema(ma.Schema):
     
     class Meta:
         # fields = ("id", "sets", "reps", "user")
-        fields = ("id", "sets", "reps", "user", "exercises")
+        fields = ("id", "sets", "reps", "target", "exercises", "user")
 
 set_rep_schema = SetsRepsSchema()
 sets_reps_schema = SetsRepsSchema(many=True)

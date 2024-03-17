@@ -5,14 +5,20 @@ from init import db, bcrypt
 from models.routine import Routine
 from models.exercise import Exercise, exercise_schema, exercises_schema
 
+from controllers.sets_reps_controller import sets_reps_bp
+
+exercise_bp = Blueprint("exercises", __name__, url_prefix="/<int:routine_id>/exercises")
+
 exercise_only_bp = Blueprint("exercises_only", __name__, url_prefix="/exercises")
+exercise_only_bp.register_blueprint(sets_reps_bp)
+
 # The Read - part of CRUD
 @exercise_only_bp.route("/")
 def get_all_exercises():
     stmt = db.select(Exercise).order_by(Exercise.id)
     exercises = db.session.scalars(stmt)
     return exercises_schema.dump(exercises)
-'''
+
 @exercise_only_bp.route("/<exercise_name>")
 def get_exercise_byName(exercise_name):
     stmt = db.select(Exercise).filter_by(name=exercise_name)
@@ -22,15 +28,6 @@ def get_exercise_byName(exercise_name):
     else:
         return {"error": f"'{exercise_name}' exercise hasn't been created yet"}, 404
 
-@exercise_only_bp.route("/cat/<exercise_category>")
-def get_exercises_category(exercise_category):
-    stmt = db.select(Exercise).filter_by(category=exercise_category)
-    exercises_in_category = db.session.scalars(stmt)
-    if exercises_in_category:
-        return exercises_schema.dump(exercises_in_category)
-    else:
-        return [{"error": f"'{exercise_category}' exercise hasn't been created yet"}], 404
-'''
 # The Update - part of CRUD
 @exercise_only_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
 @jwt_required()
@@ -70,10 +67,8 @@ def delete_exercise(exercise_id):
 # ("/routines/<int:routine_id>/<int:exercises>") --> PUT, PATCH, DELETE
 # ("/routines/1/exercises/2") --> PUT, PATCH, DELETE
 
-exercise_bp = Blueprint("exercises", __name__, url_prefix="/<int:routine_id>/exercises")
+# CREATE Exercises views from Routines 
 
-
-# CREATE Exercises into Routines 
 @exercise_bp.route('/', methods=["POST"])
 @jwt_required()
 def create_exrcise_in_routine(routine_id):
@@ -110,7 +105,6 @@ def delete_exrcise_in_routine(routine_id, exercise_id):
         return {"message": f"{exercise.name} exercise has been removed from {routine.weekday} routine"}
     else:
         return {"error": f"This exercise does not exist in your {routine.weekday} routine"}, 404
-        # return {"error": f"Routine {routine_id} or exercise doesn't exist"}
         
 @exercise_bp.route('/<int:exercise_id>', methods=["PUT", "PATCH"])
 @jwt_required()
@@ -131,4 +125,5 @@ def edit_exrcise_in_routine(routine_id, exercise_id):
         db.session.commit()
         return exercise_schema.dump(exercise)
     else:
-        return {"error": f"Exercise not found in {routine.weekday} routine"}, 404
+        return {"error": f"Exercise not found in '{routine.weekday}' routine"}, 404
+
