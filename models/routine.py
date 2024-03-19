@@ -2,6 +2,7 @@ from marshmallow import fields
 from init import db, ma
 
 
+
 class Routine(db.Model):
     __tablename__ = "routine_table"
     
