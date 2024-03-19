@@ -49,8 +49,7 @@ def get_routine_byDay(routine_Day):
 @routine_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_routine():
-    body_data = request.get_json()
-    # body_data = routine_schema.load(request.get_json())
+    body_data = routine_schema.load(request.get_json())
     # Create a new card model instance
     routine = Routine(
         name = body_data.get("name"), # it's unique have to handle errors
@@ -68,7 +67,7 @@ def create_new_routine():
 @routine_bp.route("/<int:routine_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_routine(routine_id):
-    body_data = request.get_json()
+    body_data = routine_schema.load(request.get_json(), partial=True)
     
     stmt = db.select(Routine).filter_by(id = routine_id)
     routine = db.session.scalar(stmt)
