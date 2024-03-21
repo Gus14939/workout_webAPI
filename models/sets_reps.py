@@ -1,6 +1,9 @@
-from marshmallow import fields
+from marshmallow import fields, validate
+from marshmallow.validate import Length, And, Regexp, OneOf
+
 from init import db, ma
 
+GOALS = ("Tone", "Definition", "Endurance", "Power", "Strength")
 
 class SetsReps(db.Model):
     __tablename__ = "sets_and_reps_table"
@@ -21,6 +24,13 @@ class SetsReps(db.Model):
     exercises = db.relationship("Exercise", back_populates="sets_reps")
 
 class SetsRepsSchema(ma.Schema):
+    
+    # Validation
+    sets = fields.Integer(strict=True, required=True, validate=[validate.Range(min=1, max=99, error="Value must be greater than 0 and no bigger than 99")])
+    
+    reps = fields.Integer(strict=True, required=True, validate=[validate.Range(min=1, max=99, error="Value must be greater than 0 and no bigger than 99")])
+    
+    goal = fields.String(validate=OneOf(GOALS))
     
     user = fields.Nested("UserSchema", only=["name", "email"])
     

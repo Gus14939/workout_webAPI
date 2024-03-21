@@ -32,7 +32,7 @@ def get_exercise_byName(exercise_name):
 @exercise_only_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_exercise(exercise_id):
-    body_data = request.get_json()
+    body_data = exercise_schema.load(request.get_json())
     
     stmt = db.select(Exercise).filter_by(id = exercise_id)
     exercise = db.session.scalar(stmt)
@@ -72,7 +72,8 @@ def delete_exercise(exercise_id):
 @exercise_bp.route('/', methods=["POST"])
 @jwt_required()
 def create_exrcise_in_routine(routine_id):
-    body_data = request.get_json()
+    body_data = exercise_schema.load(request.get_json())
+    
     stmt = db.select(Routine).filter_by(id=routine_id)
     routine = db.session.scalar(stmt)
     if routine:
@@ -109,7 +110,7 @@ def delete_exrcise_in_routine(routine_id, exercise_id):
 @exercise_bp.route('/<int:exercise_id>', methods=["PUT", "PATCH"])
 @jwt_required()
 def edit_exrcise_in_routine(routine_id, exercise_id):
-    body_data = request.get_json()
+    body_data = exercise_schema.load(request.get_json())
     stmt = db.select(Exercise).filter_by(id=exercise_id, routine_id=routine_id)
     exercise = db.session.scalar(stmt)
     

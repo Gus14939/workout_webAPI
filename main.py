@@ -19,9 +19,16 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
     
+    # Error handling 
     @app.errorhandler(ValidationError)
     def validation_error(err):
         return {"error": err.messages}, 400
+    
+    @app.errorhandler(404)
+    def not_found(err):
+        return {"error": "Not found"}, 404
+    
+    # Add CLI commands
     
     from controllers.cli_controller import db_commands
     app.register_blueprint(db_commands)
@@ -43,6 +50,3 @@ def create_app():
     # app.register_blueprint(sets_reps_bp)
     #
     return app
-
-
-# flask --app main run -p 5001 /// to run in a different port from 5000

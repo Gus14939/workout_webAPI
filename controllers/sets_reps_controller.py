@@ -19,7 +19,7 @@ sets_reps_bp = Blueprint("set_and_reps", __name__, url_prefix="/<int:exercise_id
 @sets_reps_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_sets_reps(exercise_id):
-    body_data = request.get_json()
+    body_data = set_rep_schema.load(request.get_json(), partial=True)
     stmt = db.select(Exercise).filter_by(id=exercise_id)
     exercise = db.session.scalar(stmt)
     
@@ -27,7 +27,7 @@ def create_sets_reps(exercise_id):
     set_rep = db.session.scalar(stmt_set_rep)
     
     if exercise.sets_reps:
-        return [{"error": f"There are asigned sets and repetitions to {exercise.name}"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}]
+        return [{"error": f"There are asigned sets and repetitions to '{exercise.name}'"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}]
     if exercise:
         set_rep = SetsReps(
             sets = body_data.get("sets"),
@@ -40,7 +40,7 @@ def create_sets_reps(exercise_id):
         db.session.commit()
         return set_rep_schema.dump(set_rep), 201
     else:
-        return {"error": f"{exercise.name} not found"}, 404
+        return {"error": f"'{exercise.name}' not found"}, 404
 
 @sets_reps_bp.route("/", methods=["DELETE"])
 @jwt_required()
@@ -51,17 +51,19 @@ def delete_sets_reps(exercise_id):
     stmt_exercise = db.select(Exercise).filter_by(id=exercise_id)
     exercise = db.session.scalar(stmt_exercise)
     
-    if set_rep:
+    if not exercise:
+        return {"error": f"Not found, sets or repetitions are not yet set up"}, 404
+    elif exercise and set_rep:
         db.session.delete(set_rep)
         db.session.commit()
-        return {"message": f"sets and reps for {exercise.name} have been deleted"}
+        return {"message": f"sets and reps for '{exercise.name}' have been deleted"}
     else:
-        return {"error": f"sets and repetitions are not yet set up for {exercise.name}"}, 404
+        return {"error": f"Not found, sets or repetitions are not yet set up for '{exercise.name}'"}, 404
     
 @sets_reps_bp.route("/<int:sets_reps_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def edit_sets_reps(exercise_id, sets_reps_id):
-    body_data = request.get_json()
+    body_data = set_rep_schema.load(request.get_json(), partial=True)
     stmt = db.select(SetsReps).filter_by(id=sets_reps_id, exercise_id=exercise_id)
     set_rep = db.session.scalar(stmt)
     
