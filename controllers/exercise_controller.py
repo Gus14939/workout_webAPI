@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from init import db, bcrypt
 from models.routine import Routine
 from models.exercise import Exercise, exercise_schema, exercises_schema
+from models.user import User
 
 from controllers.sets_reps_controller import sets_reps_bp
 
@@ -61,12 +62,6 @@ def delete_exercise(exercise_id):
     else:
         return {"message": f"Exercise not found"}, 404
 
-# ("/routines/<int:routine_id>/exercises") --> GET, POST
-# ("/routines/1/exercises") --> GET, POST
-
-# ("/routines/<int:routine_id>/<int:exercises>") --> PUT, PATCH, DELETE
-# ("/routines/1/exercises/2") --> PUT, PATCH, DELETE
-
 # CREATE Exercises views from Routines 
 
 @exercise_bp.route('/', methods=["POST"])
@@ -76,7 +71,10 @@ def create_exrcise_in_routine(routine_id):
     
     stmt = db.select(Routine).filter_by(id=routine_id)
     routine = db.session.scalar(stmt)
+    
     if routine:
+        if str(routine.user_id) != get_jwt_identity():
+            return {"error": f"Only the creator of '{routine.name}' routine can add exercises to it"}
         exercise = Exercise(
             name = body_data.get("name"),
             category = body_data.get("category"),
@@ -94,13 +92,15 @@ def create_exrcise_in_routine(routine_id):
 @exercise_bp.route('/<int:exercise_id>', methods=["DELETE"])
 @jwt_required()
 def delete_exrcise_in_routine(routine_id, exercise_id):
-    stmt = db.select(Exercise).filter_by(id=exercise_id)#, routine=routine_id)
+    stmt = db.select(Exercise).filter_by(id=exercise_id)
     exercise = db.session.scalar(stmt)
     
     routine_stmt = db.select(Routine).filter_by(id=routine_id)
     routine = db.session.scalar(routine_stmt)
      
     if exercise and exercise.routine_id == routine_id:
+        if str(exercise.user_id) != get_jwt_identity():
+            return {"error": "Only the creator can delete this exercise"}
         db.session.delete(exercise)
         db.session.commit()
         return {"message": f"{exercise.name} exercise has been removed from {routine.weekday} routine"}
@@ -118,6 +118,8 @@ def edit_exrcise_in_routine(routine_id, exercise_id):
     routine = db.session.scalar(stmt_routine)
     
     if exercise:
+        if str(exercise.user_id) != get_jwt_identity():
+            return {"error": "Only the creator can can edit this exercise"}
         exercise.name = body_data.get("name") or exercise.name
         exercise.category = body_data.get("category") or exercise.category
         exercise.muscles = body_data.get("muscles") or exercise.muscles
@@ -128,3 +130,9 @@ def edit_exrcise_in_routine(routine_id, exercise_id):
     else:
         return {"error": f"Exercise not found in '{routine.weekday}' routine"}, 404
 
+
+def is_user_admin():
+    user_id = get_jwt_identity
+    stmt =  db.select(User).filter_by(id=user_id)
+    user = db.session.scalar(stmt)
+    return user.is_admin

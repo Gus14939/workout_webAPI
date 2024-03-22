@@ -8,7 +8,7 @@ from psycopg2 import errorcodes
 from init import db, bcrypt
 from models.user import User, user_schema
 
-# my tries
+# Library to aid in the correct form of the user's email imput
 from email_validator import validate_email, EmailNotValidError
 
 
@@ -18,7 +18,9 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 def auth_register():
     try:
         # from body data
-        body_data = request.get_json()
+        body_data = user_schema.load(request.get_json())
+        # body_data = request.get_json()
+        
         print("Received data:", body_data)  # print line for debugging
         
         # validate email
@@ -29,21 +31,15 @@ def auth_register():
         except EmailNotValidError as e:
             return {"error": str(e)}, 400
         
-        name = body_data.get("name")
-        age = body_data.get("age")
-        weight = body_data.get("weight")
-        height = body_data.get("height")
-        gender = body_data.get("gender")
-
             
         # create user instance
         new_user = User(
-            name = name,
+            name = body_data.get("name"),
             email = normalised_email,
-            age = age,
-            weight = weight,
-            height = height,
-            gender = gender,
+            age = body_data.get("age"),
+            weight = body_data.get("weight"),
+            height = body_data.get("height"),
+            gender = body_data.get("gender"),
             date_joined = date.today()
             # is_admin
         )

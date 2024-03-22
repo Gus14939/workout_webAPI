@@ -10,7 +10,7 @@ class Exercise(db.Model):
     __tablename__ = "exercise_table"
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(24), nullable=False, unique=True)
+    name = db.Column(db.String(24), nullable=False)
     category = db.Column(db.String(20))
     muscles = db.Column(db.String(60))
     description = db.Column(db.Text)
@@ -30,11 +30,11 @@ class ExerciseSchema(ma.Schema):
         Regexp('^[A-Za-z0-9 -_+,]+$', error="Only Alphanumeric characters, dashes, underscore, plus sign, and coma")
     ))
     # 2 names cannot be the same
-    @validates("name")
-    def same_name(self, new_exercise_name):
-        existing_exercise_name = db.session.query(Exercise).filter_by(name=new_exercise_name).first()
-        if existing_exercise_name:
-            raise ValidationError(f"There's a exercise named '{new_exercise_name}' already. Assign a different name")
+    # @validates("name")
+    # def same_name(self, new_exercise_name):
+    #     existing_exercise_name = db.session.query(Exercise).filter_by(name=new_exercise_name).first()
+    #     if existing_exercise_name:
+    #         raise ValidationError(f"There's a exercise named '{new_exercise_name}' already. Assign a different name")
         
     category = fields.String(validate=OneOf(DIFFICULTY))
     
