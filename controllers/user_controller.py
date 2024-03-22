@@ -26,13 +26,18 @@ def get_one_profile(user_id):
     
 
 @profile_bp.route("/<int:user_id>", methods=["PATCH", "PUT"])
+@jwt_required()
 def edit_profile(user_id):
     
-    body_data = request.get_json()
+    body_data = user_schema.load(request.get_json(), partial=True)
     
     stmt = db.select(User).filter_by(id=user_id)
     profile = db.session.scalar(stmt)
+    
     if profile:
+        if str(profile.id) != get_jwt_identity():
+            return {"error": "Only the profile owner can edit this routine"}, 403
+        
         profile.weight = body_data.get("weight") or profile.weight
         db.session.commit()
         return {"message": f"{profile.name}'s weight is now {profile.weight}kg"}
@@ -41,12 +46,28 @@ def edit_profile(user_id):
             
 
 @profile_bp.route("/<int:user_id>", methods=["DELETE"])
+@jwt_required()
 def delete_profile(user_id):
+    
+    is_admin = is_user_admin()
+    
     stmt = db.select(User).filter_by(id=user_id)
     profile = db.session.scalar(stmt)
+    print(is_admin)
     if profile:
-       db.session.delete(profile) 
-       db.session.commit()
-       return {"message": f"{profile.name} profile has now been deleted"}
+        if not is_admin:
+            if str(profile.id) != get_jwt_identity():
+                return {"error": "Only the profile owner or admin can delete this routine"}, 403
+            # return {"error": "Not authorised to delete a card"}, 403
+        
+        db.session.delete(profile) 
+        db.session.commit()
+        return {"message": f"{profile.name} profile has now been deleted"}
     else:
-       return {"error": f"{profile.name} does not exist"}, 404
+        return {"error": f"{profile.name} does not exist"}, 404
+   
+def is_user_admin():
+    user_id = get_jwt_identity()
+    stmt = db.select(User).filter_by(id=user_id)
+    user = db.session.scalar(stmt)
+    return user.is_admin

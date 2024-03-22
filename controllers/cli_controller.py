@@ -26,9 +26,9 @@ def seed_tables():
             email = "admin@workoutwebAPI.com",
             password = bcrypt.generate_password_hash('1234').decode('utf-8'),
             date_joined = date.today(),
-            age = "",
-            weight = "",
-            height = "",
+            age = 0,
+            weight = 0,
+            height = 0,
             gender = "",
             is_admin = True
         ),
@@ -37,10 +37,10 @@ def seed_tables():
             email = "gus.jim@workoutwebAPI.com",
             password = bcrypt.generate_password_hash('1234').decode('utf-8'),
             date_joined = date.today(),
-            age = "43",
-            weight = "68",
-            height = "170",
-            gender = "1"
+            age = 43,
+            weight = 68,
+            height = 170,
+            gender = "M"
         )
     ]
     db.session.add_all(users)    
