@@ -11,6 +11,7 @@ from controllers.sets_reps_controller import sets_reps_bp
 exercise_bp = Blueprint("exercises", __name__, url_prefix="/<int:routine_id>/exercises")
 
 exercise_only_bp = Blueprint("exercises_only", __name__, url_prefix="/exercises")
+
 exercise_only_bp.register_blueprint(sets_reps_bp)
 
 # The Read - part of CRUD
@@ -30,37 +31,36 @@ def get_exercise_byName(exercise_name):
         return {"error": f"'{exercise_name}' exercise hasn't been created yet"}, 404
 
 # The Update - part of CRUD
-@exercise_only_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
-@jwt_required()
-def update_exercise(exercise_id):
-    body_data = exercise_schema.load(request.get_json())
+# @exercise_only_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
+# @jwt_required()
+# def update_exercise(exercise_id):
+#     body_data = exercise_schema.load(request.get_json())
     
-    stmt = db.select(Exercise).filter_by(id = exercise_id)
-    exercise = db.session.scalar(stmt)
+#     stmt = db.select(Exercise).filter_by(id = exercise_id)
+#     exercise = db.session.scalar(stmt)
     
-    if exercise:
-        exercise.name = body_data.get("name") or exercise.name
-        exercise.category = body_data.get("category") or exercise.category
-        exercise.muscles = body_data.get("muscles") or exercise.muscles
-        exercise.description = body_data.get("description") or exercise.description
+#     if exercise:
+#         if str(exercise.user_id) != get_jwt_identity():
+#             return {"error": f"Only the creator of the routine can edit this exercise"}, 403
+#         exercise.name = body_data.get("name") or exercise.name
+#         exercise.category = body_data.get("category") or exercise.category
+#         exercise.muscles = body_data.get("muscles") or exercise.muscles
+#         exercise.description = body_data.get("description") or exercise.description
     
-        db.session.commit()
-        return exercise_schema.dump(exercise)
-    else:
-        return {"message": f"Exercise not found"}, 404
+#         db.session.commit()
+#         return exercise_schema.dump(exercise)
+#     else:
+#         return {"message": f"Exercise not found"}, 404
      
-# The Delete - part of CRUD
-@exercise_only_bp.route("/<int:exercise_id>", methods=["DELETE"])
-@jwt_required()
-def delete_exercise(exercise_id):
-    stmt = db.select(Exercise).where(Exercise.id == exercise_id)
-    exercise = db.session.scalar(stmt)
-    if exercise:
-        db.session.delete(exercise)
-        db.session.commit() 
-        return {"message": f"{exercise.name} exercise has now been deleted"}
-    else:
-        return {"message": f"Exercise not found"}, 404
+# # The Delete - part of CRUD
+# @exercise_only_bp.route("/<int:exercise_id>", methods=["DELETE"])
+# @jwt_required()
+# def delete_exercise(exercise_id):
+#     stmt = db.select(Exercise).filter_by(id=exercise_id)
+#     exercise = db.session.scalar(stmt)
+     
+#     db.session.delete(exercise)
+#     db.session.commit()
 
 # CREATE Exercises views from Routines 
 
@@ -74,7 +74,7 @@ def create_exrcise_in_routine(routine_id):
     
     if routine:
         if str(routine.user_id) != get_jwt_identity():
-            return {"error": f"Only the creator of '{routine.name}' routine can add exercises to it"}
+            return {"error": f"Only the creator of '{routine.name}' routine can add exercises to it"}, 403
         exercise = Exercise(
             name = body_data.get("name"),
             category = body_data.get("category"),
@@ -100,7 +100,7 @@ def delete_exrcise_in_routine(routine_id, exercise_id):
      
     if exercise and exercise.routine_id == routine_id:
         if str(exercise.user_id) != get_jwt_identity():
-            return {"error": "Only the creator can delete this exercise"}
+            return {"error": "Only the creator can delete this exercise"}, 403
         db.session.delete(exercise)
         db.session.commit()
         return {"message": f"{exercise.name} exercise has been removed from {routine.weekday} routine"}
@@ -119,7 +119,7 @@ def edit_exrcise_in_routine(routine_id, exercise_id):
     
     if exercise:
         if str(exercise.user_id) != get_jwt_identity():
-            return {"error": "Only the creator can can edit this exercise"}
+            return {"error": "Only the creator can can edit this exercise"}, 403
         exercise.name = body_data.get("name") or exercise.name
         exercise.category = body_data.get("category") or exercise.category
         exercise.muscles = body_data.get("muscles") or exercise.muscles

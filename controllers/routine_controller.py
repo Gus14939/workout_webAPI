@@ -55,23 +55,23 @@ def create_new_routine():
     stmt = db.select(Routine)
     routine = db.session.scalar(stmt)
     
-    # Create a new card model instance
+    # Create a new routine model instance
     routine = Routine(
-        name = body_data.get("name"), # it's unique have to handle errors
+        name = body_data.get("name"),
         description = body_data.get("description"),
         weekday = body_data.get("weekday"),
         user_id = get_jwt_identity()
     )
     
-    name_stmt = db.select(db.func.count()).select_from(Routine).filter_by(name=routine.name)
-    # day_stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=routine.weekday)
-    repeated_routine_name = db.session.scalar(name_stmt)
-    # repeated_routine_day = db.session.scalar(day_stmt)
+    # name_stmt = db.select(db.func.count()).select_from(Routine).filter_by(name=routine.name)
+    # # day_stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=routine.weekday)
+    # repeated_routine_name = db.session.scalar(name_stmt)
+    # # repeated_routine_day = db.session.scalar(day_stmt)
     
-    if repeated_routine_name >= 1:
-        if str(routine.user_id) == get_jwt_identity():
-            print(routine.user_id)
-            raise ValidationError(f"'{routine.name}' routine for {routine.user_id} already.")
+    # if repeated_routine_name >= 1:
+    # if str(routine.user_id) == get_jwt_identity():
+    #     print(routine.user_id)
+    #     raise ValidationError(f"'{routine.name}' routine for {routine.user_id} already.")
         # elif repeated_routine_day > 0:
         #     raise ValidationError(f"There's a routine for '{routine.weekday}'. Only one routine per day")
     
@@ -80,7 +80,7 @@ def create_new_routine():
     # add to the session and commit
     db.session.add(routine)
     db.session.commit()
-    # return the newly cerated card
+    # return the newly cerated routine
     return routine_schema.dump(routine), 201
         
 # The Update - part of CRUD
@@ -95,15 +95,15 @@ def update_routine(routine_id):
     if routine:
         if str(routine.user_id) != get_jwt_identity():
             print(routine.user)
-            return {"error": "Only the creator of the routine can edit it"}
+            return {"error": "Only the creator of the routine can edit it"}, 403
         
-        if routine.weekday in WEEKDAYS:
-            index_of_routine_day_in_WEEKDAYS = WEEKDAYS.index(routine.weekday)
-            stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=WEEKDAYS[index_of_routine_day_in_WEEKDAYS])
-            routines_in_day_count = db.session.scalar(stmt)
+        # if routine.weekday in WEEKDAYS:
+        #     index_of_routine_day_in_WEEKDAYS = WEEKDAYS.index(routine.weekday)
+        #     stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=WEEKDAYS[index_of_routine_day_in_WEEKDAYS])
+        #     routines_in_day_count = db.session.scalar(stmt)
             
-            if routines_in_day_count > 0:
-                raise ValidationError(f"There's a routine for {routine.weekday} already. Only one routine per day")
+        #     if routines_in_day_count > 0:
+        #         raise ValidationError(f"There's a routine for {routine.weekday} already. Only one routine per day")
     
         routine.name = body_data.get("name") or routine.name
         routine.description = body_data.get("description") or routine.description
@@ -122,16 +122,10 @@ def delete_routine(routine_id):
     routine = db.session.scalar(stmt)
     if routine:
         if str(routine.user_id) != get_jwt_identity():
-            return {"error": "Only the creator can delete this routine"}
+            return {"error": "Only the creator can delete this routine"}, 403
         db.session.delete(routine)
         db.session.commit() 
         return {"message": f"{routine.name} routine for {routine.weekday} has now been deleted"}
     else:
         return {"message": f"Routine not found"}, 404
     
-    
-def is_user_admin():
-    user_id = get_jwt_identity
-    stmt =  db.select(User).filter_by(id=user_id)
-    user = db.session.scalar(stmt)
-    return user.is_admin

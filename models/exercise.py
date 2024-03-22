@@ -29,12 +29,6 @@ class ExerciseSchema(ma.Schema):
         Length(min=3, max=24, error="The name should be 3 to 24 characters"),
         Regexp('^[A-Za-z0-9 -_+,]+$', error="Only Alphanumeric characters, dashes, underscore, plus sign, and coma")
     ))
-    # 2 names cannot be the same
-    # @validates("name")
-    # def same_name(self, new_exercise_name):
-    #     existing_exercise_name = db.session.query(Exercise).filter_by(name=new_exercise_name).first()
-    #     if existing_exercise_name:
-    #         raise ValidationError(f"There's a exercise named '{new_exercise_name}' already. Assign a different name")
         
     category = fields.String(validate=OneOf(DIFFICULTY))
     
@@ -43,7 +37,7 @@ class ExerciseSchema(ma.Schema):
     description = fields.String(validate=Length(min=10, max=128, error="Exercise description should be between 10 and 128 characters long"))    
     
     user = fields.Nested('UserSchema', only=["name"])
-    routine = fields.Nested('RoutineSchema', only=["weekday"])
+    routine = fields.Nested('RoutineSchema', only=["weekday", "name"])
     sets_reps = fields.List(fields.Nested('SetsRepsSchema', only=["id", "sets", "reps", "goal"]))
     
     class Meta:

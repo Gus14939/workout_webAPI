@@ -10,9 +10,9 @@ class Routine(db.Model):
     __tablename__ = "routine_table"
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(24), nullable=False) # have to catch error
+    name = db.Column(db.String(24), nullable=False)
     description = db.Column(db.String(128))
-    weekday = db.Column(db.String(10))
+    weekday = db.Column(db.String(10), nullable=False)
     
     
     user_id = db.Column(db.Integer, db.ForeignKey("user_table.id"), nullable=False)

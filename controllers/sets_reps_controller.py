@@ -28,7 +28,7 @@ def create_sets_reps(exercise_id):
     set_rep = db.session.scalar(stmt_set_rep)
     
     if exercise.sets_reps:
-        return [{"error": f"There are asigned sets and repetitions to '{exercise.name}'"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}]
+        return [{"error": f"There are asigned sets and reps to '{exercise.name}'"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}], 403
     
     if exercise:
         set_rep = SetsReps(
@@ -54,15 +54,15 @@ def delete_sets_reps(exercise_id):
     exercise = db.session.scalar(stmt_exercise)
     
     if not exercise:
-        return {"error": f"Not found, sets or repetitions are not yet set up"}, 404
+        return {"error": f"Not found, sets or reps are not yet set up"}, 404
     elif exercise and set_rep:
         if str(exercise.user_id) != get_jwt_identity():
-            return {"error": f"Only the creator of '{exercise.name}' can delete its associted sets and reps"}
+            return {"error": f"Only the creator of '{exercise.name}' can delete its associted sets and reps"}, 403
         db.session.delete(set_rep)
         db.session.commit()
         return {"message": f"sets and reps for '{exercise.name}' have been deleted"}
     else:
-        return {"error": f"Not found, sets or repetitions are not yet set up for '{exercise.name}'"}, 404
+        return {"error": f"Not found, sets or reps are not yet set up for this exercise"}, 404
     
 @sets_reps_bp.route("/<int:sets_reps_id>", methods=["PATCH", "PUT"])
 @jwt_required()
@@ -73,7 +73,7 @@ def edit_sets_reps(exercise_id, sets_reps_id):
     
     if set_rep:
         if str(set_rep.user_id) != get_jwt_identity():
-            return {"error": f"These sets and reps are associted to another user's exercise, you cannot modify it"}
+            return {"error": f"These sets and reps are associted to another user's exercise, you cannot modify it"}, 403
         set_rep.sets = body_data.get("sets") or set_rep.sets
         set_rep.reps = body_data.get("reps") or set_rep.reps
         set_rep.goal = body_data.get("goal") or set_rep.goal
@@ -81,11 +81,4 @@ def edit_sets_reps(exercise_id, sets_reps_id):
         db.session.commit()
         return set_rep_schema.dump(set_rep)
     else:
-        return {"error": f"No sets and repetitions found in '{exercise_id.name}'"}, 404
-    
-    
-def is_user_admin():
-    user_id = get_jwt_identity
-    stmt =  db.select(User).filter_by(id=user_id)
-    user = db.session.scalar(stmt)
-    return user.is_admin
+        return {"error": f"No sets and reps found"}, 404
