@@ -1,10 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from marshmallow.exceptions import ValidationError
 
 from init import db
 from models.routine import Routine, routines_schema, routine_schema, WEEKDAYS
-from models.user import User
 
 from controllers.exercise_controller import exercise_bp
 

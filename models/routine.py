@@ -1,6 +1,5 @@
-from marshmallow import fields#, validates
+from marshmallow import fields
 from marshmallow.validate import Length, And, Regexp, OneOf
-# from marshmallow.exceptions import ValidationError
 
 from init import db, ma
 
@@ -32,7 +31,7 @@ class RoutineSchema(ma.Schema):
     
     weekday = fields.String(validate=OneOf(WEEKDAYS, error="Must be the full name of a day of the week"))
     
-    user = fields.Nested('UserSchema', exclude=["password", "email", "is_admin", "date_joined", "routines", "exercises", "sets_reps"])
+    user = fields.Nested('UserSchema', exclude=["password", "is_admin", "date_joined", "routines", "exercises", "sets_reps"])
     exercises = fields.List(fields.Nested('ExerciseSchema', exclude=["routine"]))
     
     class Meta:

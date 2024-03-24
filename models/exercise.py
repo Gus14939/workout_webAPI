@@ -1,6 +1,5 @@
-from marshmallow import fields, validates
+from marshmallow import fields
 from marshmallow.validate import Length, And, Regexp, OneOf
-from marshmallow.exceptions import ValidationError
 
 from init import db, ma
 

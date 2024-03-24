@@ -19,9 +19,6 @@ def auth_register():
     try:
         # from body data
         body_data = user_schema.load(request.get_json())
-        # body_data = request.get_json()
-        
-        print("Received data:", body_data)  # print line for debugging
         
         # validate email
         email = body_data.get("email")
