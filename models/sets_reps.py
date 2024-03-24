@@ -37,7 +37,6 @@ class SetsRepsSchema(ma.Schema):
     exercises = fields.Nested("ExerciseSchema", only=["name"])
     
     class Meta:
-        # fields = ("id", "sets", "reps", "user")
         fields = ("id", "sets", "reps", "goal", "exercises", "user")
 
 set_rep_schema = SetsRepsSchema()

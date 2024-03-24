@@ -32,6 +32,7 @@ class UserSchema(ma.Schema):
         Length(min=2, max=32, error="The name should be 2 to 32 characters"),
         Regexp('^[A-Za-z -]+$', error="Only Alphabetic characters, dashes")
     ))
+    
     # email validation is done in auth_controller.py
     
     password = fields.String(validate=Regexp(

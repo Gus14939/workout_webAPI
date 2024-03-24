@@ -75,19 +75,6 @@ def create_new_routine():
         user_id = get_jwt_identity()
     )
     
-    # name_stmt = db.select(db.func.count()).select_from(Routine).filter_by(name=routine.name)
-    # # day_stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=routine.weekday)
-    # repeated_routine_name = db.session.scalar(name_stmt)
-    # # repeated_routine_day = db.session.scalar(day_stmt)
-    
-    # if repeated_routine_name >= 1:
-    # if str(routine.user_id) == get_jwt_identity():
-    #     print(routine.user_id)
-    #     raise ValidationError(f"'{routine.name}' routine for {routine.user_id} already.")
-        # elif repeated_routine_day > 0:
-        #     raise ValidationError(f"There's a routine for '{routine.weekday}'. Only one routine per day")
-    
-    
     # add to the session and commit
     db.session.add(routine)
     db.session.commit()
@@ -111,14 +98,6 @@ def update_routine(routine_id):
         if str(routine.user_id) != get_jwt_identity():
             print(routine.user)
             return {"error": "Only the creator of the routine can edit it"}, 403
-        
-        # if routine.weekday in WEEKDAYS:
-        #     index_of_routine_day_in_WEEKDAYS = WEEKDAYS.index(routine.weekday)
-        #     stmt = db.select(db.func.count()).select_from(Routine).filter_by(weekday=WEEKDAYS[index_of_routine_day_in_WEEKDAYS])
-        #     routines_in_day_count = db.session.scalar(stmt)
-            
-        #     if routines_in_day_count > 0:
-        #         raise ValidationError(f"There's a routine for {routine.weekday} already. Only one routine per day")
     
         routine.name = body_data.get("name") or routine.name
         routine.description = body_data.get("description") or routine.description
