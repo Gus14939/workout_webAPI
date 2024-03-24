@@ -34,7 +34,10 @@ class UserSchema(ma.Schema):
     ))
     # email validation is done in auth_controller.py
     
-    # password
+    password = fields.String(validate=Regexp(
+        r'^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,}$',
+        error="Password must be at least 6 characters long; contain one or many digits, special characters, lowercase and uppercase letters. No space allowed."
+    ))
     
     age = fields.Integer(strict=True, required=True, validate=[validate.Range(min=15, max=99, error="Age must be between 15 an 99 year old")])
     
@@ -54,5 +57,5 @@ class UserSchema(ma.Schema):
         
         fields = ("id", "name", "email", "password", "age", "weight", "height", "gender", "date_joined", "is_admin", "routines", "exercises", "sets_reps")
         
-user_schema = UserSchema(exclude=["routines", "exercises", "sets_reps"])#"password", 
-users_schema = UserSchema(many=True, exclude=["routines", "exercises", "sets_reps"])#"password", 
+user_schema = UserSchema(exclude=["routines", "exercises", "sets_reps"])
+users_schema = UserSchema(many=True, exclude=["routines", "exercises", "sets_reps"])

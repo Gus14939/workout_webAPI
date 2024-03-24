@@ -1,5 +1,6 @@
 from datetime import date
 from flask import Blueprint
+
 from init import db, bcrypt
 from models.user import User
 from models.routine import Routine
@@ -24,7 +25,7 @@ def seed_tables():
         User(
             name = "The Admin",
             email = "admin@workoutwebAPI.com",
-            password = bcrypt.generate_password_hash('1234').decode('utf-8'),
+            password = bcrypt.generate_password_hash('Pass@123').decode('utf-8'),
             date_joined = date.today(),
             age = 0,
             weight = 0,
@@ -35,7 +36,7 @@ def seed_tables():
         User(
             name = "Gustavo Jimenez",
             email = "gus.jim@workoutwebAPI.com",
-            password = bcrypt.generate_password_hash('1234').decode('utf-8'),
+            password = bcrypt.generate_password_hash('Pass@123').decode('utf-8'),
             date_joined = date.today(),
             age = 43,
             weight = 68,
@@ -103,15 +104,15 @@ def seed_tables():
     
     sets_reps = [
         SetsReps(
-            sets = "6",
-            reps = "4",
+            sets = 6,
+            reps = 4,
             goal = "Strenght",
             user = users[1],
             exercises = exercises[0]
         ), 
         SetsReps(
-            sets = "3",
-            reps = "20",
+            sets = 3,
+            reps = 20,
             goal = "Tone",
             user = users[1],
             exercises = exercises[1]

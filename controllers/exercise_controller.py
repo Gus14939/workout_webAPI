@@ -30,43 +30,11 @@ def get_exercise_byName(exercise_name):
     else:
         return {"error": f"'{exercise_name}' exercise hasn't been created yet"}, 404
 
-# The Update - part of CRUD
-# @exercise_only_bp.route("/<int:exercise_id>", methods=["PATCH", "PUT"])
-# @jwt_required()
-# def update_exercise(exercise_id):
-#     body_data = exercise_schema.load(request.get_json())
-    
-#     stmt = db.select(Exercise).filter_by(id = exercise_id)
-#     exercise = db.session.scalar(stmt)
-    
-#     if exercise:
-#         if str(exercise.user_id) != get_jwt_identity():
-#             return {"error": f"Only the creator of the routine can edit this exercise"}, 403
-#         exercise.name = body_data.get("name") or exercise.name
-#         exercise.category = body_data.get("category") or exercise.category
-#         exercise.muscles = body_data.get("muscles") or exercise.muscles
-#         exercise.description = body_data.get("description") or exercise.description
-    
-#         db.session.commit()
-#         return exercise_schema.dump(exercise)
-#     else:
-#         return {"message": f"Exercise not found"}, 404
-     
-# # The Delete - part of CRUD
-# @exercise_only_bp.route("/<int:exercise_id>", methods=["DELETE"])
-# @jwt_required()
-# def delete_exercise(exercise_id):
-#     stmt = db.select(Exercise).filter_by(id=exercise_id)
-#     exercise = db.session.scalar(stmt)
-     
-#     db.session.delete(exercise)
-#     db.session.commit()
-
 # CREATE Exercises views from Routines 
 
 @exercise_bp.route('/', methods=["POST"])
 @jwt_required()
-def create_exrcise_in_routine(routine_id):
+def create_exercise_in_routine(routine_id):
     body_data = exercise_schema.load(request.get_json())
     
     stmt = db.select(Routine).filter_by(id=routine_id)
