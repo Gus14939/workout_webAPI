@@ -10,13 +10,18 @@ from controllers.exercise_controller import exercise_bp
 routine_bp = Blueprint("routines", __name__, url_prefix="/routines")
 routine_bp.register_blueprint(exercise_bp) 
 
-# The Read - part of CRUD
+# The Read - part of CRUD - it does not required authentication
+# "/routines"
+# HTTP GET request. This view retrieves all routines in the database
 @routine_bp.route("/")
 def get_all_routines():
     stmt = db.select(Routine).order_by(Routine.id)
     routines = db.session.scalars(stmt)
     return routines_schema.dump(routines)
 
+# "/routines/<routine_id>"
+# HTTP GET request. This view retrieves one routine filtered by the id
+# Returns 200, 404
 @routine_bp.route("/<int:routine_id>")
 def get_routine_byID(routine_id):
     stmt = db.select(Routine).filter_by(id=routine_id)
@@ -25,7 +30,10 @@ def get_routine_byID(routine_id):
         return routine_schema.dump(one_routine)
     else:
         return {"error": f"Routine with 'id {routine_id}' hasn't been setup yet"}, 404
-    
+
+# "/routines/<routine_name>"
+# HTTP GET request. This view retrieves one routine filtered by the name
+# Returns 200, 404
 @routine_bp.route("/name/<routine_name>")
 def get_routine_byName(routine_name):
     stmt = db.select(Routine).filter_by(name=routine_name)
@@ -35,6 +43,9 @@ def get_routine_byName(routine_name):
     else:
         return {"error": f"Routine for '{routine_name}' hasn't been setup yet"}, 404
 
+# "/routines/<routine_weekday>"
+# HTTP GET request. This view retrieves one routine filtered by the day of the week
+# Returns 200, 404
 @routine_bp.route("/day/<routine_Day>")
 def get_routine_byDay(routine_Day):
     stmt = db.select(Routine).filter_by(weekday=routine_Day)
@@ -46,6 +57,9 @@ def get_routine_byDay(routine_Day):
         return {"error": f"Routine for '{routine_Day}' hasn't been setup yet"}, 404
 
 # The Create - part of CRUD
+# "/routines/<routine_id>"
+# HTTP POST request. A registered user can create a routine
+# Requires authentication
 @routine_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_new_routine():
@@ -74,7 +88,6 @@ def create_new_routine():
         #     raise ValidationError(f"There's a routine for '{routine.weekday}'. Only one routine per day")
     
     
-    
     # add to the session and commit
     db.session.add(routine)
     db.session.commit()
@@ -82,6 +95,10 @@ def create_new_routine():
     return routine_schema.dump(routine), 201
         
 # The Update - part of CRUD
+# "/routines/<routine_id>"
+# HTTP PATCH request. A registered user can modify a routine
+# Requires authentication
+# Returns 200, 403, 404
 @routine_bp.route("/<int:routine_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def update_routine(routine_id):
@@ -113,6 +130,10 @@ def update_routine(routine_id):
         return {"message": f"Routine not found"}, 404
         
 # The Delete - part of CRUD
+# "/routines/<routine_id>"
+# HTTP DELETE request. A registered user can remove a routine
+# Requires authentication
+# Returns 200, 403 , 404
 @routine_bp.route("/<int:routine_id>", methods=["DELETE"])
 @jwt_required()
 def delete_routine(routine_id):

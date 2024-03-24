@@ -7,6 +7,11 @@ from models.sets_reps import SetsReps, set_rep_schema
 
 sets_reps_bp = Blueprint("set_and_reps", __name__, url_prefix="/<int:exercise_id>/sets_and_reps")
 
+# The Create - part of CRUD
+# "/exercises/<exercise_id>/sets_and_reps"
+# HTTP POST request. The owner of the routine can add set and reps info in his/her exercises
+# Requires authentication
+# Returns 200, 201, 403, 404
 @sets_reps_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_sets_reps(exercise_id):
@@ -17,10 +22,10 @@ def create_sets_reps(exercise_id):
     stmt_set_rep = db.select(SetsReps).filter_by(exercise_id=exercise_id)
     set_rep = db.session.scalar(stmt_set_rep)
     
-    if exercise.sets_reps:
+    if set_rep:
         return [{"error": f"There are asigned sets and reps to '{exercise.name}'"},{"Sets and Reps Assigned": f"set: {set_rep.sets}, repetitons: {set_rep.reps}, goal: {set_rep.goal}"}], 409
     
-    if exercise:
+    elif exercise:
         if str(exercise.user_id) != get_jwt_identity():
             return {"error": f"Only the creator of '{exercise.name}' can add sets and reps"}, 403
         set_rep = SetsReps(
@@ -36,6 +41,11 @@ def create_sets_reps(exercise_id):
     else:
         return {"error": f"'exercise' not found"}, 404
 
+# The Delete - part of CRUD
+# "/exercises/<exercise_id>/sets_and_reps"
+# HTTP DELETE request. Only owner of the routine can delete sets and reps
+# Requires authentication
+# Returns 200, 201, 403, 404
 @sets_reps_bp.route("/", methods=["DELETE"])
 @jwt_required()
 def delete_sets_reps(exercise_id):
@@ -53,7 +63,12 @@ def delete_sets_reps(exercise_id):
         return {"message": f"sets and reps for '{exercise.name}' have been deleted"}
     else:
         return {"error": f"Not found, sets or reps are not yet set up for this exercise"}, 404
-    
+
+# The Update - part of CRUD
+# "/exercises/<exercise_id>/sets_and_reps"
+# HTTP PATCH request. Only owner can modify sets and reps
+# Requires authentication
+# Returns 200, 403, 404
 @sets_reps_bp.route("/<int:sets_reps_id>", methods=["PATCH", "PUT"])
 @jwt_required()
 def edit_sets_reps(exercise_id, sets_reps_id):
