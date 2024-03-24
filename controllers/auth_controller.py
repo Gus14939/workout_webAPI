@@ -14,6 +14,9 @@ from email_validator import validate_email, EmailNotValidError
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+# The Create - part of CRUD
+# "/auth/register"
+# HTTP POST request for registering a new user. Returns jwt
 @auth_bp.route("/register", methods=["POST"])
 def auth_register():
     try:
@@ -62,10 +65,9 @@ def auth_register():
         return {"error": "An error occurred"}, 500
     except ValueError as e:
         return {"error": str(e)}, 400
-    
-    
-
-
+        
+# "/auth/login"
+# HTTP POST request for loging in with email and password. Returns jwt, which allows the user to CRUD in the web app
 @auth_bp.route("/login", methods=["POST"])
 def auth_login():
     

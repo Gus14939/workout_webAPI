@@ -15,6 +15,10 @@ exercise_only_bp = Blueprint("exercises_only", __name__, url_prefix="/exercises"
 exercise_only_bp.register_blueprint(sets_reps_bp)
 
 # The Read - part of CRUD
+# "/routine/<routine_id>/exercises"
+# HTTP GET request. This view retrieves all exercises in the database
+# Requires authentication
+# Returns 200, 404
 @exercise_only_bp.route("/")
 def get_all_exercises():
     stmt = db.select(Exercise).order_by(Exercise.id)
@@ -30,8 +34,14 @@ def get_exercise_byName(exercise_name):
     else:
         return {"error": f"'{exercise_name}' exercise hasn't been created yet"}, 404
 
+
 # CREATE Exercises views from Routines 
 
+# The Create - part of CRUD
+# "/routine/<routine_id>/exercises"
+# HTTP POST request. A registered user can create an exercise into his/her routines
+# Requires authentication
+# Returns 200, 403, 404 
 @exercise_bp.route('/', methods=["POST"])
 @jwt_required()
 def create_exercise_in_routine(routine_id):
@@ -56,7 +66,12 @@ def create_exercise_in_routine(routine_id):
         return exercise_schema.dump(exercise), 201
     else:
         return {"error": f"Routine with id {routine_id} doesn't exist"}, 404
-    
+   
+# The Delete - part of CRUD
+# "/routine/<routine_id>/exercises<exercise_id>"
+# HTTP DELETE request. Only the user who created the exercise can delete it
+# Requires authentication
+# Returns 200, 403, 404 
 @exercise_bp.route('/<int:exercise_id>', methods=["DELETE"])
 @jwt_required()
 def delete_exrcise_in_routine(routine_id, exercise_id):
@@ -74,7 +89,12 @@ def delete_exrcise_in_routine(routine_id, exercise_id):
         return {"message": f"{exercise.name} exercise has been removed from {routine.weekday} routine"}
     else:
         return {"error": f"This exercise does not exist in your {routine.weekday} routine"}, 404
-        
+
+# The Update - part of CRUD
+# "/routine/<routine_id>/exercises<exercise_id>"
+# HTTP PATCH request. Only a registered user can modify an exercise
+# Requires authentication
+# Returns 200, 403, 404
 @exercise_bp.route('/<int:exercise_id>', methods=["PUT", "PATCH"])
 @jwt_required()
 def edit_exrcise_in_routine(routine_id, exercise_id):
